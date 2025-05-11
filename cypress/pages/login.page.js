@@ -1,7 +1,6 @@
 class LoginPage {
 
     constructor() {
-    this.expectedUrl = 'https://www.saucedemo.com/';
     this.locatorUsername = '[data-test="username"]';
     this.locatorPassword = '[data-test="password"]';
     this.locatorLoginBtn = '[data-test="login-button"]';
@@ -9,10 +8,10 @@ class LoginPage {
 
 
   visit() {
-    cy.visit(this.expectedUrl);
+    cy.visit('/');
   }
    assertAtLoginPage() {
-    cy.url().should('eq', this.expectedUrl);
+    cy.url().should('eq', `${Cypress.config().baseUrl}/`);
   }
     fillUserPassword(username, password) {
     cy.get(this.locatorUsername).type(username);
