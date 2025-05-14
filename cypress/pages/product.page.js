@@ -254,6 +254,15 @@ removeRedTshirt() {
   clickBoltTshirtProduct() {
     return cy.get(this.locatorBoltTshirtProduct).click();
   }
+  clickFleeceJacketProduct() {
+    return cy.get(this.locatorFleeceJacketProduct).click();
+  }
+  clickOnesieProduct() {
+    return cy.get(this.locatorOnesieProduct).click();
+  }
+  clickRedTshirtProduct() {
+    return cy.get(this.locatorRedTshirtProduct).click();
+  }
   clickBacktoProducts() {
     return cy.get(this.locatorBackToProducts).click();
   }

@@ -1,21 +1,55 @@
-  const operations = [
-    // การเพิ่มสินค้า
-    { type: 'add', method: 'addBackpack', expectedCount: '1' },
-    { type: 'add', method: 'addBikelike', expectedCount: '2' },
-    { type: 'add', method: 'addBoltTshirt', expectedCount: '3' },
-    { type: 'add', method: 'addFleeceJacket', expectedCount: '4' },
-    { type: 'add', method: 'addOnesie', expectedCount: '5' },
-    { type: 'add', method: 'addRedTshirt', expectedCount: '6' },
-    
-    // การลบสินค้า
-    { type: 'remove', method: 'removeBackpack', expectedCount: '5' },
-    { type: 'remove', method: 'removeBikelike', expectedCount: '4' },
-    { type: 'remove', method: 'removeBoltTshirt', expectedCount: '3' },
-    { type: 'remove', method: 'removeFleeceJacket', expectedCount: '2' },
-    { type: 'remove', method: 'removeOnesie', expectedCount: '1' },
-    { type: 'remove', method: 'removeRedTshirt', expectedCount: '' }
-  ];
+const addItems = [
+  {
+    method: 'addBackpack',
+    clickMethod: 'clickBackpackProduct',
+    expectedUrl: '/inventory-item.html?id=4',
+    expectedCount: '1',
+  },
+  {
+    method: 'addBikelike',
+    clickMethod: 'clickBikeLightProduct',
+    expectedUrl: '/inventory-item.html?id=0',
+    expectedCount: '2',
+  },
+  {
+    method: 'addBoltTshirt',
+    clickMethod: 'clickBoltTshirtProduct',
+    expectedUrl: '/inventory-item.html?id=1',
+    expectedCount: '3',
+  },
+  {
+    method: 'addFleeceJacket',
+    clickMethod: 'clickFleeceJacketProduct',
+    expectedUrl: '/inventory-item.html?id=5',
+    expectedCount: '4',
+  },
+  {
+    method: 'addOnesie',
+    clickMethod: 'clickOnesieProduct',
+    expectedUrl: '/inventory-item.html?id=2',
+    expectedCount: '5',
+  },
+  {
+    method: 'addRedTshirt',
+    clickMethod: 'clickRedTshirtProduct',
+    expectedUrl: '/inventory-item.html?id=3',
+    expectedCount: '6',
+  },
+];
 
+
+const removeItems = [
+  { method: 'removeBackpack', expectedCount: '5' },
+  { method: 'removeBikelike', expectedCount: '4' },
+  { method: 'removeBoltTshirt', expectedCount: '3' },
+  { method: 'removeFleeceJacket', expectedCount: '2' },
+  { method: 'removeOnesie', expectedCount: '1' },
+  { method: 'removeRedTshirt', expectedCount: '' },
+];
   module.exports = {
-    operations,
+    addItems,
+    removeItems,
+    addItemsCount: addItems.length,
+    removeItemsCount: removeItems.length,
+
   };
