@@ -1,0 +1,2 @@
+# .gitignore
+cypress/credentials.json

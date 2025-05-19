@@ -266,6 +266,40 @@ removeRedTshirt() {
   clickBacktoProducts() {
     return cy.get(this.locatorBackToProducts).click();
   }
+  getProductNames(){
+    return cy.get(this.locatorClassitemname).then($elements => {
+      const productNames = [];
+      $elements.each((index, element) => {
+        productNames.push(element.innerText);
+      });
+      return productNames;
+    });
+  }
+  getProductPrices(){
+    return cy.get(this.locatorClassitemprice).then($elements => {
+      const productPrices = [];
+      $elements.each((index, element) => {
+        productPrices.push(element.innerText);
+      });
+      return productPrices;
+    });
+  }
+  sortByNameAZ() {
+    return cy.get(this.locatorSortContainer).select('az');
+  }
+  sortByNameZA() {
+    return cy.get(this.locatorSortContainer).select('za');
+  }
+  sortByPriceLowToHigh() {
+    return cy.get(this.locatorSortContainer).select('lohi');
+  }
+  sortByPriceHighToLow() {
+    return cy.get(this.locatorSortContainer).select('hilo');
+  }
+  clickCartIcon() {
+    return cy.get(this.locatorCartIcon).click();
+  }
 }
+
 
 export const productPage = new ProductPage();
