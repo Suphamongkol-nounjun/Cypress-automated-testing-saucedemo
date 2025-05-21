@@ -299,7 +299,10 @@ removeRedTshirt() {
   clickCartIcon() {
     return cy.get(this.locatorCartIcon).click();
   }
+  getPricefromArray(productsArray) {
+  return productsArray.reduce((total, item) => {
+    return total + Number(item.price.replace('$', ''));
+  }, 0);
 }
-
-
+}
 export const productPage = new ProductPage();
