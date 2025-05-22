@@ -10,7 +10,7 @@ module.exports = defineConfig({
         async updateTestResult({ testCaseId, status }) {
           await updateTestResult(testCaseId, status);
           return null;
-       }
+        }
       });
     },
   },
