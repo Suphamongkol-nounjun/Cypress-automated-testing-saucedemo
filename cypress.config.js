@@ -2,7 +2,7 @@ const { defineConfig } = require('cypress');
 const { updateTestResult } = require('./cypress/utils/updateGoogleSheet');
 
 module.exports = defineConfig({
-  projectId: "gqirx8",
+  projectId: "4uhssq",
   e2e: {
     baseUrl: 'https://www.saucedemo.com',
     setupNodeEvents(on, config) {
