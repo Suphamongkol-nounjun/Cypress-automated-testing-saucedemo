@@ -1,0 +1,38 @@
+version: 2.1
+
+executors:
+  cypress-executor:
+    docker:
+      - image: cypress/browsers:node-18.12.0-chrome-107 # ใช้ image ที่มี Cypress และ Chrome
+    working_directory: ~/app
+
+jobs:
+  cypress-run:
+    executor: cypress-executor
+    parallelism: 2  # เทียบเท่า matrix: containers: [1, 2]
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - v1-deps-{{ checksum "package-lock.json" }}
+            - v1-deps-
+
+      - run:
+          name: Install dependencies
+          command: npm ci
+
+      - save_cache:
+          paths:
+            - ~/.npm
+          key: v1-deps-{{ checksum "package-lock.json" }}
+
+      - run:
+          name: Run Cypress tests (parallel)
+          command: npx cypress run --record --parallel --key $CYPRESS_RECORD_KEY
+
+workflows:
+  version: 2
+  run-tests:
+    jobs:
+      - cypress-run
