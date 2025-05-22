@@ -3,6 +3,7 @@ version: 2.1
 # https://circleci.com/developer/orbs/orb/cypress-io/cypress
 orbs:
   cypress: cypress-io/cypress@3
+
 workflows:
   build:
     jobs:
