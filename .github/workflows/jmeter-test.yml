@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Code
+    - name: Checkout
       uses: actions/checkout@v4
 
     - name: Install JMeter
@@ -19,23 +19,21 @@ jobs:
         sudo apt install -y wget unzip openjdk-17-jdk
         wget https://downloads.apache.org//jmeter/binaries/apache-jmeter-5.6.3.zip
         unzip apache-jmeter-5.6.3.zip
-        export PATH=$PWD/apache-jmeter-5.6.3/bin:$PATH
 
-    - name: Run JMeter Test Plan
+    - name: Prepare JMeter folders
+      run: |
+        mkdir -p jmeter/report
+
+    - name: Run JMeter Test
       run: |
         apache-jmeter-5.6.3/bin/jmeter \
-          -n -t jmeter/test.jmx \
+          -n -t jmeter/api_test.jmx \
           -l jmeter/results.jtl \
           -e -o jmeter/report
-
-    - name: Upload Result (.jtl)
-      uses: actions/upload-artifact@v4
-      with:
-        name: jmeter-results
-        path: jmeter/results.jtl
 
     - name: Upload HTML Report
       uses: actions/upload-artifact@v4
       with:
         name: jmeter-html-report
         path: jmeter/report
+
