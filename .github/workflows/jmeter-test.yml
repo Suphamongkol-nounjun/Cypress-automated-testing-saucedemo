@@ -1,0 +1,41 @@
+name: JMeter API Test
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  jmeter-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Install JMeter
+      run: |
+        sudo apt update
+        sudo apt install -y wget unzip openjdk-17-jdk
+        wget https://downloads.apache.org//jmeter/binaries/apache-jmeter-5.6.3.zip
+        unzip apache-jmeter-5.6.3.zip
+        export PATH=$PWD/apache-jmeter-5.6.3/bin:$PATH
+
+    - name: Run JMeter Test Plan
+      run: |
+        apache-jmeter-5.6.3/bin/jmeter \
+          -n -t jmeter/api_test.jmx \
+          -l jmeter/results.jtl \
+          -e -o jmeter/report
+
+    - name: Upload Result (.jtl)
+      uses: actions/upload-artifact@v3
+      with:
+        name: jmeter-results
+        path: jmeter/results.jtl
+
+    - name: Upload HTML Report
+      uses: actions/upload-artifact@v3
+      with:
+        name: jmeter-html-report
+        path: jmeter/report
