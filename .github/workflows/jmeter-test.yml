@@ -11,7 +11,7 @@ jobs:
 
     steps:
     - name: Checkout Code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Install JMeter
       run: |
@@ -24,18 +24,18 @@ jobs:
     - name: Run JMeter Test Plan
       run: |
         apache-jmeter-5.6.3/bin/jmeter \
-          -n -t jmeter/api_test.jmx \
+          -n -t jmeter/test.jmx \
           -l jmeter/results.jtl \
           -e -o jmeter/report
 
     - name: Upload Result (.jtl)
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: jmeter-results
         path: jmeter/results.jtl
 
     - name: Upload HTML Report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: jmeter-html-report
         path: jmeter/report
