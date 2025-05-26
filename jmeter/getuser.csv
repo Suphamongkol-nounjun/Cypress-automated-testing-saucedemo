@@ -1,0 +1,3 @@
+test_case,user_id,user_page,expected_status,expected_error
+Valid user by ID,2,2,200,
+Invalid user by ID,23,99,404,

@@ -1,0 +1,4 @@
+test_case,email,password,expected_status,expected_error
+valid_login,eve.holt@reqres.in,cityslicka,200,
+invalid_user,test@reqres.in,wrongpass,400,"user not found"
+missing_password,,missingpassword,400,"Missing email or username"
