@@ -98,48 +98,6 @@
             </ResponseAssertion>
             <hashTree/>
           </hashTree>
-          <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="JSR223 Sampler">
-            <stringProp name="scriptLanguage">javascript</stringProp>
-            <stringProp name="parameters"></stringProp>
-            <stringProp name="filename"></stringProp>
-            <stringProp name="cacheKey">true</stringProp>
-            <stringProp name="script">// ดึงค่าที่ได้จาก CSV
-var expectedStatus = vars.get(&quot;expected_status&quot;);
-var expectedMessage = vars.get(&quot;expected_message&quot;);
-
-// ดึงค่าจาก response จริง
-var statusCode = prev.getResponseCode();
-var responseBody = prev.getResponseDataAsString();
-
-// แปลง expectedStatus เป็นตัวเลข
-var expectedStatusInt = parseInt(expectedStatus);
-
-// Log ค่าเข้าและออกทั้งหมด
-log.info(&quot;[ASSERT] --- Start ---&quot;);
-log.info(&quot;[ASSERT] Expected status: &quot; + expectedStatus);
-log.info(&quot;[ASSERT] Actual status: &quot; + statusCode);
-log.info(&quot;[ASSERT] Expected message: &quot; + expectedMessage);
-log.info(&quot;[ASSERT] Response body: &quot; + responseBody);
-
-// ตรวจสอบว่า Status ตรงกันหรือไม่
-if (statusCode != expectedStatus) {
-    prev.setSuccessful(false);
-    log.info(&quot;[ASSERT] ❌ Status mismatch! Expected: &quot; + expectedStatus + &quot;, Got: &quot; + statusCode);
-}
-// ตรวจสอบว่าข้อความที่ต้องการอยู่ใน response หรือไม่
-else if (expectedMessage &amp;&amp; !responseBody.includes(expectedMessage)) {
-    prev.setSuccessful(false);
-    log.info(&quot;[ASSERT] ❌ Message mismatch! &apos;&quot; + expectedMessage + &quot;&apos; not found in response.&quot;);
-}
-else {
-    prev.setSuccessful(true);
-    log.info(&quot;[ASSERT] ✅ Assertion passed.&quot;);
-}
-
-log.info(&quot;[ASSERT] --- End ---&quot;);
-</stringProp>
-          </JSR223Sampler>
-          <hashTree/>
         </hashTree>
         <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree">
           <boolProp name="ResultCollector.error_logging">false</boolProp>
@@ -239,48 +197,6 @@ log.info(&quot;[ASSERT] --- End ---&quot;);
             </ResponseAssertion>
             <hashTree/>
           </hashTree>
-          <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="JSR223 Sampler">
-            <stringProp name="scriptLanguage">javascript</stringProp>
-            <stringProp name="parameters"></stringProp>
-            <stringProp name="filename"></stringProp>
-            <stringProp name="cacheKey">true</stringProp>
-            <stringProp name="script">// ดึงค่าที่ได้จาก CSV
-var expectedStatus = vars.get(&quot;expected_status&quot;);
-var expectedMessage = vars.get(&quot;expected_message&quot;);
-
-// ดึงค่าจาก response จริง
-var statusCode = prev.getResponseCode();
-var responseBody = prev.getResponseDataAsString();
-
-// แปลง expectedStatus เป็นตัวเลข
-var expectedStatusInt = parseInt(expectedStatus);
-
-// Log ค่าเข้าและออกทั้งหมด
-log.info(&quot;[ASSERT] --- Start ---&quot;);
-log.info(&quot;[ASSERT] Expected status: &quot; + expectedStatus);
-log.info(&quot;[ASSERT] Actual status: &quot; + statusCode);
-log.info(&quot;[ASSERT] Expected message: &quot; + expectedMessage);
-log.info(&quot;[ASSERT] Response body: &quot; + responseBody);
-
-// ตรวจสอบว่า Status ตรงกันหรือไม่
-if (statusCode != expectedStatus) {
-    prev.setSuccessful(false);
-    log.info(&quot;[ASSERT] ❌ Status mismatch! Expected: &quot; + expectedStatus + &quot;, Got: &quot; + statusCode);
-}
-// ตรวจสอบว่าข้อความที่ต้องการอยู่ใน response หรือไม่
-else if (expectedMessage &amp;&amp; !responseBody.includes(expectedMessage)) {
-    prev.setSuccessful(false);
-    log.info(&quot;[ASSERT] ❌ Message mismatch! &apos;&quot; + expectedMessage + &quot;&apos; not found in response.&quot;);
-}
-else {
-    prev.setSuccessful(true);
-    log.info(&quot;[ASSERT] ✅ Assertion passed.&quot;);
-}
-
-log.info(&quot;[ASSERT] --- End ---&quot;);
-</stringProp>
-          </JSR223Sampler>
-          <hashTree/>
         </hashTree>
         <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree">
           <boolProp name="ResultCollector.error_logging">false</boolProp>
@@ -380,48 +296,6 @@ log.info(&quot;[ASSERT] --- End ---&quot;);
             </ResponseAssertion>
             <hashTree/>
           </hashTree>
-          <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="JSR223 Sampler">
-            <stringProp name="scriptLanguage">javascript</stringProp>
-            <stringProp name="parameters"></stringProp>
-            <stringProp name="filename"></stringProp>
-            <stringProp name="cacheKey">true</stringProp>
-            <stringProp name="script">// ดึงค่าที่ได้จาก CSV
-var expectedStatus = vars.get(&quot;expected_status&quot;);
-var expectedMessage = vars.get(&quot;expected_message&quot;);
-
-// ดึงค่าจาก response จริง
-var statusCode = prev.getResponseCode();
-var responseBody = prev.getResponseDataAsString();
-
-// แปลง expectedStatus เป็นตัวเลข
-var expectedStatusInt = parseInt(expectedStatus);
-
-// Log ค่าเข้าและออกทั้งหมด
-log.info(&quot;[ASSERT] --- Start ---&quot;);
-log.info(&quot;[ASSERT] Expected status: &quot; + expectedStatus);
-log.info(&quot;[ASSERT] Actual status: &quot; + statusCode);
-log.info(&quot;[ASSERT] Expected message: &quot; + expectedMessage);
-log.info(&quot;[ASSERT] Response body: &quot; + responseBody);
-
-// ตรวจสอบว่า Status ตรงกันหรือไม่
-if (statusCode != expectedStatus) {
-    prev.setSuccessful(false);
-    log.info(&quot;[ASSERT] ❌ Status mismatch! Expected: &quot; + expectedStatus + &quot;, Got: &quot; + statusCode);
-}
-// ตรวจสอบว่าข้อความที่ต้องการอยู่ใน response หรือไม่
-else if (expectedMessage &amp;&amp; !responseBody.includes(expectedMessage)) {
-    prev.setSuccessful(false);
-    log.info(&quot;[ASSERT] ❌ Message mismatch! &apos;&quot; + expectedMessage + &quot;&apos; not found in response.&quot;);
-}
-else {
-    prev.setSuccessful(true);
-    log.info(&quot;[ASSERT] ✅ Assertion passed.&quot;);
-}
-
-log.info(&quot;[ASSERT] --- End ---&quot;);
-</stringProp>
-          </JSR223Sampler>
-          <hashTree/>
         </hashTree>
         <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree">
           <boolProp name="ResultCollector.error_logging">false</boolProp>
