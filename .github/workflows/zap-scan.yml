@@ -3,7 +3,7 @@ name: ZAP DAST Scan with Juice Shop
 on:
   push:
     branches:
-      - main
+      - main # กำหนด branch ที่ต้องการให้ workflow ทำงาน
   pull_request:
     branches:
       - main
@@ -12,6 +12,7 @@ on:
 jobs:
   dast-scan:
     runs-on: ubuntu-latest
+    name: Scan Juice Shop Web Application
 
     steps:
     - name: Checkout repository
@@ -22,80 +23,49 @@ jobs:
         docker compose version
 
     - name: Start Juice Shop
-      # รัน Juice Shop แบบ detached ก่อน
+      # รัน Juice Shop แบบ detached
       run: docker compose up -d juice-shop
+      # ถ้า docker-compose.yml ของคุณอยู่ในโฟลเดอร์ย่อย (เช่น 'docker'), คุณอาจต้องใช้:
+      # run: docker compose -f ./docker/docker-compose.yml up -d juice-shop
 
     - name: Wait for Juice Shop to be ready
-      # ตรวจสอบว่า Juice Shop พร้อมทำงาน
+      # ตรวจสอบว่า Juice Shop พร้อมทำงานบน localhost:3000 ของ GitHub Actions runner
       run: |
         echo "Waiting for Juice Shop (http://localhost:3000) to be ready..."
-        for i in $(seq 1 30); do
+        for i in $(seq 1 60); do # รอสูงสุด 60 วินาที
           curl -s http://localhost:3000 > /dev/null && break
-          echo "Juice Shop not ready yet, waiting 5 seconds..."
-          sleep 5
-          if [ $i -eq 30 ]; then
-            echo "Juice Shop did not start in time. Exiting."
+          echo "Juice Shop not ready yet, waiting 1 second..."
+          sleep 1
+          if [ $i -eq 60 ]; then
+            echo "Error: Juice Shop did not start in time. Exiting."
             exit 1
           fi
         done
         echo "Juice Shop is ready."
 
-    - name: Run ZAP Baseline Scan (and generate all reports)
-      run: |
-          REPORT_DIR="zap-reports"
-          mkdir -p $REPORT_DIR
-
-          echo "Starting ZAP Baseline Scan..."
-          docker run --rm \
-            --network host \
-            -v "$(pwd)/$REPORT_DIR:/zap/wrk" \
-            ghcr.io/zaproxy/zaproxy:stable zap-baseline.py \ # <<< แก้ไขตรงนี้
-            -t http://localhost:3000 \
-            -g /zap/wrk/zap-baseline-report.html \
-            -r /zap/wrk/zap-baseline-report.xml \
-            -J /zap/wrk/zap-baseline-report.json \
-            -X /zap/wrk/zap-baseline-report.md \
-            --html /zap/wrk/zap-baseline-report.html \
-            --markdown /zap/wrk/zap-baseline-report.md \
-            --xml /zap/wrk/zap-baseline-report.xml \
-            --json /zap/wrk/zap-baseline-report.json \
-            --silent
-
-          echo "Baseline Scan complete."
-          
-    - name: Run ZAP Full Scan (Active Scan)
-      run: |
-          REPORT_DIR="zap-reports" # กำหนดอีกครั้งเพื่อความชัดเจน
-          
-          echo "Starting ZAP Full Scan (Active Scan)..."
-          docker run --rm \
-            --network host \
-            -v "$(pwd)/$REPORT_DIR:/zap/wrk" \
-            ghcr.io/zaproxy/zaproxy:stable zap-full-scan.py \ # <<< แก้ไขตรงนี้
-            -t http://localhost:3000 \
-            -D 60 \
-            -j \
-            -g /zap/wrk/zap-full-report.html \
-            -r /zap/wrk/zap-full-report.xml \
-            -J /zap/wrk/zap-full-report.json \
-            -X /zap/wrk/zap-full-report.md \
-            --html /zap/wrk/zap-full-report.html \
-            --markdown /zap/wrk/zap-full-report.md \
-            --xml /zap/wrk/zap-full-report.xml \
-            --json /zap/wrk/zap-full-report.json \
-            --silent
-
-          echo "Full Scan complete."
-
-        # --- Generate other reports (ถ้ามี) ---
-        # ZAP CLI รองรับ report format ตามที่ระบุใน --html, --xml, --json, --markdown
-        # สำหรับรูปแบบอื่นๆ เช่น Open API, GraphQL, sarif, etc.
-        # คุณอาจต้องรัน ZAP ในโหมด daemon แล้วใช้ zap-cli หรือ ZAP API
-        # แต่สำหรับ quick and comprehensive reports, baseline and full scan scripts ก็ครอบคลุมแล้ว
+    - name: Run ZAP Full Scan (using pre-built action)
+      uses: zaproxy/action-full-scan@v0.12.0 # ใช้เวอร์ชันล่าสุดที่แนะนำ
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        # เปลี่ยน target เป็น localhost:3000 เพราะ Juice Shop รันบน runner host
+        target: 'http://localhost:3000'
+        # docker_name: 'ghcr.io/zaproxy/zaproxy:stable' # Optional: ถ้าต้องการระบุ image เอง
+                                                    # default ของ action คือ ghcr.io/zaproxy/zaproxy/zap-stable
+        # rules_file_name: '.zap/rules.tsv' # Optional: ถ้ามีไฟล์กฎที่กำหนดเอง
+        cmd_options: '-a -j' # -a: Active Scan, -j: Jenkins mode (exit with non-zero if issues found)
 
     - name: Upload ZAP Reports
+      # ZAP action จะสร้างรายงานในโฟลเดอร์ที่ชื่อว่า 'zap_report' โดยอัตโนมัติ
+      # และจะสร้างรายงานในรูปแบบ HTML และ MD เป็นหลัก
+      # สำหรับรายงานอื่นๆ เช่น XML, JSON อาจจะต้องตั้งค่าเพิ่มเติมใน cmd_options
+      # หรือรัน ZAP CLI เองแยกต่างหากดังที่เราได้ทำในตัวอย่างก่อนหน้า
       uses: actions/upload-artifact@v4
       with:
         name: zap-scan-reports
-        path: zap-reports/
+        path: zap_report/ # Path นี้คือ default ที่ zaproxy/action-full-scan สร้างรายงานไว้
         retention-days: 7 # เก็บ artifact ไว้ 7 วัน
+
+    - name: Stop Docker Compose services
+      # Cleanup: หยุด Juice Shop หลังจากสแกนเสร็จ
+      if: always() # รันขั้นตอนนี้เสมอ ไม่ว่าจะสำเร็จหรือล้มเหลว
+      run: docker compose down
