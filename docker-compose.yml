@@ -5,7 +5,7 @@ services:
   juice-shop:
     image: bkimminich/juice-shop:v16.0.0
     ports:
-      - "3000:3000"
+      - "4000:4000"
     restart: always
 
   zap:
