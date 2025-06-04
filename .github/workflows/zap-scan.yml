@@ -49,7 +49,7 @@ jobs:
           docker run --rm \
             --network host \
             -v "$(pwd)/$REPORT_DIR:/zap/wrk" \
-            ghcr.io/zaproxy/zaproxy/zap-stable:2.14.0 zap-baseline.py \ # <<< แก้ไขตรงนี้
+            ghcr.io/zaproxy/zaproxy:stable zap-baseline.py \ # <<< แก้ไขตรงนี้
             -t http://localhost:3000 \
             -g /zap/wrk/zap-baseline-report.html \
             -r /zap/wrk/zap-baseline-report.xml \
