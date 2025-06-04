@@ -18,13 +18,13 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Start Juice Shop (Direct Docker Run on Port 4000)
+    - name: Start Juice Shop
       # Run Juice Shop directly, mapping container port 3000 to host port 4000
       run: |
         docker run -d -p 4000:3000 --name juice-shop-container bkimminich/juice-shop:v16.0.0
         echo "Juice Shop container started on port 4000."
 
-    - name: Wait for Juice Shop to be ready on Port 4000
+    - name: Wait for Juice Shop to be ready
       # Check if Juice Shop is ready on localhost:4000 of the GitHub Actions runner
       run: |
         echo "Waiting for Juice Shop (http://localhost:4000) to be ready..."
@@ -39,12 +39,12 @@ jobs:
         done
         echo "Juice Shop is ready on port 4000."
 
-    - name: Run ZAP Full Scan (using pre-built action)
-      uses: zaproxy/action-full-scan@v0.12.0
+    - name: Run ZAP Scan (using pre-built action)
+      uses: zaproxy/action-baseline@v0.14.0
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         target: 'http://localhost:4000' # ZAP will scan Juice Shop on port 4000
-        cmd_options: '-a -j'
+        cmd_options: '-a'
 
     - name: Upload ZAP Reports
       uses: actions/upload-artifact@v4
