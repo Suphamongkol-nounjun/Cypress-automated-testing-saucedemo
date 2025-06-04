@@ -13,6 +13,9 @@ jobs:
   dast-scan:
     runs-on: ubuntu-latest
     name: Scan Juice Shop Web Application
+    permissions:
+      # เพิ่มบรรทัดนี้: ให้สิทธิ์ในการเขียน (write) issues
+      issues: write
 
     steps:
     - name: Checkout repository
@@ -45,6 +48,7 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         target: 'http://localhost:4000' # ZAP will scan Juice Shop on port 4000
         cmd_options: '-a'
+        allow_issue_writing: true # ตรวจสอบให้แน่ใจว่าตัวเลือกนี้เป็น true
 
     - name: Upload ZAP Reports
       uses: actions/upload-artifact@v4
