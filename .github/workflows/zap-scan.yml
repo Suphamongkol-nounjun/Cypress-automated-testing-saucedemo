@@ -41,56 +41,51 @@ jobs:
         echo "Juice Shop is ready."
 
     - name: Run ZAP Baseline Scan (and generate all reports)
-      # ใช้ owasp/zap2docker-stable image โดยตรงเพื่อรัน ZAP scan
-      # ZAP Baseline Scan จะสแกนแบบ passive และสร้างรายงาน
-      # เราจะใช้ zap.sh -cmd เพื่อสั่งงาน ZAP โดยตรง
       run: |
-        ZAP_TARGET_URL="http://juice-shop:3000" # ZAP จะเห็น Juice Shop ด้วย service name 'juice-shop'
-        REPORT_DIR="zap-reports"
-        mkdir -p $REPORT_DIR
+          REPORT_DIR="zap-reports"
+          mkdir -p $REPORT_DIR
 
-        # --- ZAP Baseline Scan ---
-        echo "Starting ZAP Baseline Scan..."
-        docker run --rm \
-          --network host \
-          -v "$(pwd)/$REPORT_DIR:/zap/wrk" \
-          owasp/zap2docker-stable:2.14.0 zap-baseline.py \
-          -t http://localhost:3000 \
-          -g /zap/wrk/zap-baseline-report.html \
-          -r /zap/wrk/zap-baseline-report.xml \
-          -J /zap/wrk/zap-baseline-report.json \
-          -X /zap/wrk/zap-baseline-report.md \
-          --html /zap/wrk/zap-baseline-report.html \
-          --markdown /zap/wrk/zap-baseline-report.md \
-          --xml /zap/wrk/zap-baseline-report.xml \
-          --json /zap/wrk/zap-baseline-report.json \
-          --silent
+          echo "Starting ZAP Baseline Scan..."
+          docker run --rm \
+            --network host \
+            -v "$(pwd)/$REPORT_DIR:/zap/wrk" \
+            ghcr.io/zaproxy/zaproxy/zap-stable:2.14.0 zap-baseline.py \ # <<< แก้ไขตรงนี้
+            -t http://localhost:3000 \
+            -g /zap/wrk/zap-baseline-report.html \
+            -r /zap/wrk/zap-baseline-report.xml \
+            -J /zap/wrk/zap-baseline-report.json \
+            -X /zap/wrk/zap-baseline-report.md \
+            --html /zap/wrk/zap-baseline-report.html \
+            --markdown /zap/wrk/zap-baseline-report.md \
+            --xml /zap/wrk/zap-baseline-report.xml \
+            --json /zap/wrk/zap-baseline-report.json \
+            --silent
 
-        echo "Baseline Scan complete."
+          echo "Baseline Scan complete."
+          
+    - name: Run ZAP Full Scan (Active Scan)
+      run: |
+          REPORT_DIR="zap-reports" # กำหนดอีกครั้งเพื่อความชัดเจน
+          
+          echo "Starting ZAP Full Scan (Active Scan)..."
+          docker run --rm \
+            --network host \
+            -v "$(pwd)/$REPORT_DIR:/zap/wrk" \
+            ghcr.io/zaproxy/zaproxy/zap-stable:2.14.0 zap-full-scan.py \ # <<< แก้ไขตรงนี้
+            -t http://localhost:3000 \
+            -D 60 \
+            -j \
+            -g /zap/wrk/zap-full-report.html \
+            -r /zap/wrk/zap-full-report.xml \
+            -J /zap/wrk/zap-full-report.json \
+            -X /zap/wrk/zap-full-report.md \
+            --html /zap/wrk/zap-full-report.html \
+            --markdown /zap/wrk/zap-full-report.md \
+            --xml /zap/wrk/zap-full-report.xml \
+            --json /zap/wrk/zap-full-report.json \
+            --silent
 
-        # --- ZAP Full Scan (Active Scan) ---
-        # สำหรับ Full Scan หรือ Active Scan เราจะใช้ ZAP's Automation Framework
-        # หรือ ZAP API (แต่จะซับซ้อนกว่าใน GH Actions)
-        # ดังนั้น สำหรับความง่าย เราจะใช้ 'zap-full-scan.py' ซึ่งเป็น script ที่มาพร้อมกับ ZAP Docker image
-        echo "Starting ZAP Full Scan (Active Scan)..."
-        docker run --rm \
-          --network host \
-          -v "$(pwd)/$REPORT_DIR:/zap/wrk" \
-          owasp/zap2docker-stable:2.14.0 zap-full-scan.py \
-          -t http://localhost:3000 \
-          -D 60 \
-          -j \
-          -g /zap/wrk/zap-full-report.html \
-          -r /zap/wrk/zap-full-report.xml \
-          -J /zap/wrk/zap-full-report.json \
-          -X /zap/wrk/zap-full-report.md \
-          --html /zap/wrk/zap-full-report.html \
-          --markdown /zap/wrk/zap-full-report.md \
-          --xml /zap/wrk/zap-full-report.xml \
-          --json /zap/wrk/zap-full-report.json \
-          --silent
-
-        echo "Full Scan complete."
+          echo "Full Scan complete."
 
         # --- Generate other reports (ถ้ามี) ---
         # ZAP CLI รองรับ report format ตามที่ระบุใน --html, --xml, --json, --markdown
