@@ -1,0 +1,106 @@
+name: ZAP DAST Scan with Juice Shop
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch: # อนุญาตให้รันด้วยมือ
+
+jobs:
+  dast-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Compose
+      run: |
+        docker compose version
+
+    - name: Start Juice Shop
+      # รัน Juice Shop แบบ detached ก่อน
+      run: docker compose up -d juice-shop
+
+    - name: Wait for Juice Shop to be ready
+      # ตรวจสอบว่า Juice Shop พร้อมทำงาน
+      run: |
+        echo "Waiting for Juice Shop (http://localhost:3000) to be ready..."
+        for i in $(seq 1 30); do
+          curl -s http://localhost:3000 > /dev/null && break
+          echo "Juice Shop not ready yet, waiting 5 seconds..."
+          sleep 5
+          if [ $i -eq 30 ]; then
+            echo "Juice Shop did not start in time. Exiting."
+            exit 1
+          fi
+        done
+        echo "Juice Shop is ready."
+
+    - name: Run ZAP Baseline Scan (and generate all reports)
+      # ใช้ owasp/zap2docker-stable image โดยตรงเพื่อรัน ZAP scan
+      # ZAP Baseline Scan จะสแกนแบบ passive และสร้างรายงาน
+      # เราจะใช้ zap.sh -cmd เพื่อสั่งงาน ZAP โดยตรง
+      run: |
+        ZAP_TARGET_URL="http://juice-shop:3000" # ZAP จะเห็น Juice Shop ด้วย service name 'juice-shop'
+        REPORT_DIR="zap-reports"
+        mkdir -p $REPORT_DIR
+
+        # --- ZAP Baseline Scan ---
+        echo "Starting ZAP Baseline Scan..."
+        docker run --rm \
+          --network host \
+          -v "$(pwd)/$REPORT_DIR:/zap/wrk" \
+          owasp/zap2docker-stable:2.14.0 zap-baseline.py \
+          -t http://localhost:3000 \
+          -g /zap/wrk/zap-baseline-report.html \
+          -r /zap/wrk/zap-baseline-report.xml \
+          -J /zap/wrk/zap-baseline-report.json \
+          -X /zap/wrk/zap-baseline-report.md \
+          --html /zap/wrk/zap-baseline-report.html \
+          --markdown /zap/wrk/zap-baseline-report.md \
+          --xml /zap/wrk/zap-baseline-report.xml \
+          --json /zap/wrk/zap-baseline-report.json \
+          --silent
+
+        echo "Baseline Scan complete."
+
+        # --- ZAP Full Scan (Active Scan) ---
+        # สำหรับ Full Scan หรือ Active Scan เราจะใช้ ZAP's Automation Framework
+        # หรือ ZAP API (แต่จะซับซ้อนกว่าใน GH Actions)
+        # ดังนั้น สำหรับความง่าย เราจะใช้ 'zap-full-scan.py' ซึ่งเป็น script ที่มาพร้อมกับ ZAP Docker image
+        echo "Starting ZAP Full Scan (Active Scan)..."
+        docker run --rm \
+          --network host \
+          -v "$(pwd)/$REPORT_DIR:/zap/wrk" \
+          owasp/zap2docker-stable:2.14.0 zap-full-scan.py \
+          -t http://localhost:3000 \
+          -D 60 \
+          -j \
+          -g /zap/wrk/zap-full-report.html \
+          -r /zap/wrk/zap-full-report.xml \
+          -J /zap/wrk/zap-full-report.json \
+          -X /zap/wrk/zap-full-report.md \
+          --html /zap/wrk/zap-full-report.html \
+          --markdown /zap/wrk/zap-full-report.md \
+          --xml /zap/wrk/zap-full-report.xml \
+          --json /zap/wrk/zap-full-report.json \
+          --silent
+
+        echo "Full Scan complete."
+
+        # --- Generate other reports (ถ้ามี) ---
+        # ZAP CLI รองรับ report format ตามที่ระบุใน --html, --xml, --json, --markdown
+        # สำหรับรูปแบบอื่นๆ เช่น Open API, GraphQL, sarif, etc.
+        # คุณอาจต้องรัน ZAP ในโหมด daemon แล้วใช้ zap-cli หรือ ZAP API
+        # แต่สำหรับ quick and comprehensive reports, baseline and full scan scripts ก็ครอบคลุมแล้ว
+
+    - name: Upload ZAP Reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: zap-scan-reports
+        path: zap-reports/
+        retention-days: 7 # เก็บ artifact ไว้ 7 วัน
