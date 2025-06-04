@@ -9,7 +9,7 @@ services:
     restart: always
 
   zap:
-    image: ghcr.io/zaproxy/zaproxy/zap-stable:2.14.0
+    image: ghcr.io/zaproxy/zaproxy:stable
     container_name: owasp-zap
     ports:
       - "8080:8080" # UI ของ ZAP (ไม่จำเป็นต้องใช้ใน CI/CD แต่บางคนอาจอยากเห็น)
