@@ -1,4 +1,4 @@
-name: ZAP API Scan with Juice Shop
+name: ZAP API Scan (Petstore OpenAPI)
 
 on:
   push:
@@ -7,60 +7,35 @@ on:
   pull_request:
     branches:
       - main
-  workflow_dispatch: # Allows running manually
+  workflow_dispatch: # อนุญาตให้รันด้วยมือ
 
 jobs:
-  dast-scan:
+  api-scan:
     runs-on: ubuntu-latest
-    name: Scan Juice Shop API
+    name: Scan Petstore OpenAPI
+
+    permissions:
+      issues: write # ให้สิทธิ์ในการสร้าง Issue (ถ้าต้องการ)
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Start Juice Shop (Direct Docker Run on Port 4000)
-      # Run Juice Shop directly, mapping container port 3000 to host port 4000
-      run: |
-        docker run -d -p 4000:3000 --name juice-shop-container bkimminich/juice-shop:v16.0.0
-        echo "Juice Shop container started on port 4000."
-
-    - name: Wait for Juice Shop to be ready on Port 4000
-      # Check if Juice Shop is ready on localhost:4000 of the GitHub Actions runner
-      run: |
-        echo "Waiting for Juice Shop (http://localhost:4000) to be ready..."
-        for i in $(seq 1 60); do # Wait up to 60 seconds
-          curl -s http://localhost:4000 > /dev/null && break
-          echo "Juice Shop not ready yet, waiting 1 second..."
-          sleep 1
-          if [ $i -eq 60 ]; then
-            echo "Error: Juice Shop did not start in time. Exiting."
-            exit 1
-          fi
-        done
-        echo "Juice Shop is ready on port 4000."
-
-    - name: ZAP API Scan
+    - name: Run ZAP API Scan on Petstore OpenAPI
       uses: zaproxy/action-api-scan@v0.9.0
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        # *** สำคัญมาก: Juice Shop อาจไม่มี OpenAPI definition ที่ /api ***
-        # *** ตรวจสอบและปรับ URL นี้ให้ถูกต้อง ***
-        target: 'http://localhost:4000'
-        format: openapi
+        # Target คือ URL ของ OpenAPI JSON definition
+        target: 'https://petstore.swagger.io/v2/swagger.json'
+        format: openapi # ระบุว่า target เป็น OpenAPI
         docker_name: 'ghcr.io/zaproxy/zaproxy:stable'
-        cmd_options: '-a' # -a คือ Active Scan, อาจต้องปรับตามลักษณะ API
-        allow_issue_writing: true
+        # cmd_options: '-a' # เปิด Active Scan (อาจใช้เวลานานขึ้น)
+        # cmd_options: '-r /zap/wrk/report_html.html -J /zap/wrk/report_json.json' # กำหนดชื่อไฟล์รายงานเอง
+        allow_issue_writing: true # อนุญาตให้สร้าง GitHub Issue
 
-    - name: Upload ZAP Reports
+    - name: Upload ZAP API Scan Reports
       uses: actions/upload-artifact@v4
       with:
-        name: zap-api-scan-reports
-        path: ./*.html # Or adjust as needed to capture all report files
+        name: petstore-api-scan-reports
+        path: ./*.html # หรือ ./* เพื่อรวมรายงานทั้งหมดที่สร้างใน root
         retention-days: 7
-
-    - name: Stop Juice Shop container
-      # Cleanup: Stop and remove the Juice Shop container
-      if: always() # Run this step always, regardless of success or failure
-      run: |
-        docker stop juice-shop-container
-        docker rm juice-shop-container
